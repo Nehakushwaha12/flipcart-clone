@@ -1,0 +1,5 @@
+{
+  "name": "FlipKart Clone",
+  "description": "A full-featured e-commerce application modeled after Flipkart with product browsing, cart management, authentication, and checkout flow.",
+  "requestFramePermissions": []
+}
