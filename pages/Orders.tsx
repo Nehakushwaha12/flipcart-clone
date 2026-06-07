@@ -31,50 +31,73 @@ const Orders: React.FC = () => {
   }, [user]);
 
   if (loading) {
-    return <div className="min-h-screen bg-gray-100 py-6 flex justify-center items-center"><p>Loading orders...</p></div>;
+    return <div className="min-h-screen bg-[#fffbeb] py-12 flex justify-center items-center"><p className="font-black uppercase tracking-widest text-black/40">Loading orders...</p></div>;
   }
 
   if (!user) {
     return (
-        <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center items-center">
-             <p className="text-gray-600 mb-4">Please login to view your orders.</p>
-             <Link to="/login" className="bg-blue-600 text-white px-6 py-2 rounded font-medium">Login</Link>
+        <div className="min-h-screen bg-[#fffbeb] py-12 flex flex-col justify-center items-center p-6">
+             <div className="bg-white p-12 rounded-[3rem] shadow-2xl text-center max-w-md w-full border border-amber-50">
+                <p className="text-black/60 mb-8 font-bold uppercase tracking-widest text-sm">Please login to view your orders.</p>
+                <Link to="/login" className="bg-black text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl hover:scale-105 transition-all">Login Now</Link>
+             </div>
         </div>
     );
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen py-6">
-      <div className="max-w-[1000px] mx-auto px-4">
-        <h1 className="text-lg font-medium mb-4 text-gray-800">My Orders</h1>
-        <div className="space-y-4">
+    <div className="bg-[#fffbeb] min-h-screen py-12 transition-colors duration-500">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <h1 className="text-3xl font-black mb-10 text-black uppercase tracking-tighter">My Orders History</h1>
+        <div className="space-y-8">
           {orders.map((order) => (
-             <div key={order._id} className="bg-white p-4 shadow-sm rounded-sm hover:shadow-md transition cursor-pointer border border-gray-100">
-                <div className="flex flex-col md:flex-row gap-4">
+             <div key={order._id} className="bg-white p-8 shadow-xl shadow-amber-200/20 rounded-[2.5rem] hover:scale-[1.01] transition-all cursor-pointer border border-amber-50 group">
+                <div className="flex flex-col lg:flex-row gap-10">
                     {/* Order Items */}
-                    <div className="flex-1">
+                    <div className="flex-1 space-y-6">
                         {order.items.map((item: any, idx: number) => (
-                             <div key={idx} className="flex gap-4 mb-4 last:mb-0">
-                                 <div className="w-16 h-16 shrink-0 flex items-center justify-center">
+                             <div key={idx} className="flex gap-6 items-center">
+                                 <div className="w-20 h-20 bg-amber-50 rounded-2xl p-3 shrink-0 flex items-center justify-center shadow-inner group-hover:rotate-3 transition-transform duration-500">
                                      <img src={item.image} alt={item.title} className="max-w-full max-h-full object-contain"/>
                                  </div>
                                  <div className="flex-1">
-                                     <h3 className="font-medium text-sm text-gray-800 hover:text-blue-600 truncate max-w-md">{item.title}</h3>
-                                     <p className="text-xs text-gray-500 mt-1">Quantity: {item.quantity || 1}</p>
+                                     <h3 className="font-black text-base text-black leading-tight tracking-tighter group-hover:text-amber-600 transition-colors">{item.title}</h3>
+                                     <p className="text-[10px] font-black text-black/40 mt-1 uppercase tracking-widest">Quantity: {item.quantity || 1}</p>
                                  </div>
                              </div>
                         ))}
                     </div>
 
                     {/* Order Meta */}
-                    <div className="md:w-1/3 flex flex-col justify-between pl-0 md:pl-4 border-l-0 md:border-l border-gray-100">
-                         <div>
-                            <p className="font-bold text-sm text-gray-900">₹{order.totalPrice?.toLocaleString()}</p>
-                            <div className="flex items-center gap-2 mt-2">
-                                <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                                <span className="text-sm font-medium text-gray-800">{order.status} on {new Date(order.date).toLocaleDateString()}</span>
+                    <div className="lg:w-1/3 flex flex-col justify-between p-8 bg-amber-50/50 rounded-[2rem] border border-amber-50">
+                          <div>
+                            <p className="font-black text-3xl text-black tracking-tighter">₹{order.totalPrice?.toLocaleString()}</p>
+                            
+                            <p className="text-[10px] text-black/50 mt-4 font-black uppercase tracking-[0.2em]">
+                                Ordered On: {new Date(order.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </p>
+
+                            <div className="flex items-center gap-3 mt-4">
+                                <div className={`w-3 h-3 rounded-full ${order.status === 'Delivered' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-amber-500 animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.5)]'}`}></div>
+                                <span className="text-sm font-black text-black uppercase tracking-widest">
+                                    {order.status === 'Delivered' ? 'Delivered On' : 'Arriving by'} {new Date(order.expectedDelivery || order.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </span>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 ml-4">Your item has been delivered</p>
+                            <p className="text-[10px] text-black/40 mt-2 font-black uppercase tracking-[0.2em]">
+                                {order.status === 'Delivered' ? 'Package safely arrived' : `Current Status: ${order.status}`}
+                            </p>
+                            
+                            {/* Tracking Progress Bar */}
+                            <div className="mt-8">
+                                <div className="h-2 w-full bg-white rounded-full overflow-hidden shadow-inner border border-amber-100">
+                                    <div className={`h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-1000 ${order.status === 'Delivered' ? 'w-full' : 'w-1/3'}`}></div>
+                                </div>
+                                <div className="flex justify-between text-[9px] text-black/30 mt-3 uppercase font-black tracking-widest">
+                                    <span>Placed</span>
+                                    <span>Shipped</span>
+                                    <span>Arrived</span>
+                                </div>
+                            </div>
                          </div>
                     </div>
                 </div>
@@ -82,8 +105,9 @@ const Orders: React.FC = () => {
           ))}
           
           {orders.length === 0 && (
-              <div className="bg-white p-8 text-center shadow-sm">
-                  <p className="text-gray-500">No orders found.</p>
+              <div className="bg-white p-20 text-center shadow-xl shadow-amber-200/20 rounded-[3rem] border border-amber-50">
+                  <p className="text-black/40 font-black uppercase tracking-[0.3em] text-lg">No order history found.</p>
+                  <Link to="/" className="mt-8 inline-block bg-black text-white px-12 py-5 rounded-[1.5rem] font-black uppercase tracking-widest text-sm hover:scale-105 transition-all">Start Shopping</Link>
               </div>
           )}
         </div>

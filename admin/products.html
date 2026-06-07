@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products — ApnaStore Admin</title>
+    <link rel="stylesheet" href="admin.css" />
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🛒</div>
+                <div>
+                    <div class="logo-text">ApnaStore</div>
+                    <div class="logo-sub">Admin Panel</div>
+                </div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-label">Main</div>
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="products.html" class="nav-item active">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
+                        <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
+                    </svg>
+                    Products
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                        <rect x="9" y="3" width="6" height="4" rx="1" />
+                        <path d="M9 12h6M9 16h4" />
+                    </svg>
+                    Orders
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-ghost" style="width:100%;justify-content:center;">
+                    <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main">
+            <div class="topbar">
+                <div class="topbar-title">Products</div>
+                <div class="topbar-right">
+                    <button class="btn btn-primary" onclick="openAddModal()">+ Add Product</button>
+                    <div class="admin-badge">
+                        <div class="dot"></div><span class="admin-username">admin</span>
+                    </div>
+                </div>
+            </div>
+            <div class="page">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <input class="search-input" id="search-input" placeholder="Search products…"
+                            oninput="debounceSearch()" />
+                        <select class="search-input" id="cat-filter" style="max-width:160px" onchange="loadProducts(1)">
+                            <option value="">All Categories</option>
+                            <option>Mobiles</option>
+                            <option>Electronics</option>
+                            <option>Fashion</option>
+                            <option>Home</option>
+                            <option>Appliances</option>
+                            <option>Grocery</option>
+                            <option>Beauty</option>
+                            <option>Sports</option>
+                            <option>Toys</option>
+                            <option>Travel</option>
+                            <option>Sneakers</option>
+                        </select>
+                    </div>
+                    <div id="total-count" style="font-size:13px;color:#64748b;min-width:100px;text-align:right;"></div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Price</th>
+                                <th>Rating</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-body">
+                            <tr>
+                                <td colspan="8">
+                                    <div class="loading-box">
+                                        <div class="spinner"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add / Edit Modal -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">Add Product</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="product-form" onsubmit="submitProduct(event)">
+                <input type="hidden" id="edit-id" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input id="f-title" required placeholder="Product name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <input id="f-brand" placeholder="Brand name" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="f-category" required>
+                            <option value="">Select…</option>
+                            <option>Mobiles</option>
+                            <option>Electronics</option>
+                            <option>Fashion</option>
+                            <option>Home</option>
+                            <option>Appliances</option>
+                            <option>Grocery</option>
+                            <option>Beauty</option>
+                            <option>Sports</option>
+                            <option>Toys</option>
+                            <option>Travel</option>
+                            <option>Sneakers</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subcategory</label>
+                        <input id="f-subcategory" placeholder="Smartphones, Shirts…" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (₹) *</label>
+                        <input id="f-price" type="number" min="0" required placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Original Price (₹)</label>
+                        <input id="f-original-price" type="number" min="0" placeholder="0" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Discount (%)</label>
+                        <input id="f-discount" type="number" min="0" max="100" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Rating (0–5)</label>
+                        <input id="f-rating" type="number" min="0" max="5" step="0.1" placeholder="4.5" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <input id="f-stock" type="number" min="0" placeholder="50" />
+                    </div>
+                    <div class="form-group">
+                        <label>Review Count</label>
+                        <input id="f-reviews" type="number" min="0" placeholder="0" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Image Upload</label>
+                    <input id="f-image" type="file" accept="image/*" />
+                    <small style="font-size:11px;color:#64748b;display:block;margin-top:4px">Leave empty to keep current
+                        image</small>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="f-desc" placeholder="Product description…"></textarea>
+                </div>
+                <div class="form-row" style="align-items:center">
+                    <label
+                        style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#94a3b8;cursor:pointer">
+                        <input type="checkbox" id="f-assured" /> Flipkart Assured
+                    </label>
+                    <label
+                        style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#94a3b8;cursor:pointer">
+                        <input type="checkbox" id="f-eco" /> Eco Friendly
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        let currentPage = 1;
+        let searchTimer;
+
+        function debounceSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => loadProducts(1), 400);
+        }
+
+        async function loadProducts(page = 1) {
+            currentPage = page;
+            const q = document.getElementById('search-input').value.trim();
+            const cat = document.getElementById('cat-filter').value;
+            const params = new URLSearchParams({ page, limit: 20 });
+            if (q) params.set('search', q);
+            if (cat) params.set('category', cat);
+
+            const tbody = document.getElementById('products-body');
+            tbody.innerHTML = '<tr><td colspan="8"><div class="loading-box"><div class="spinner"></div></div></td></tr>';
+
+            try {
+                const r = await apiFetch('/api/admin/products?' + params);
+                const d = await r.json();
+                document.getElementById('total-count').textContent = `${d.total} products`;
+                if (!d.products.length) {
+                    tbody.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📦</div><p>No products found</p></div></td></tr>';
+                    document.getElementById('pagination').innerHTML = '';
+                    return;
+                }
+                tbody.innerHTML = d.products.map(p => `
+        <tr>
+          <td><img class="product-img" src="${p.image || ''}" onerror="this.src='https://via.placeholder.com/44'" /></td>
+          <td><div class="truncate" style="max-width:180px;font-weight:600">${p.title}</div><div style="font-size:11px;color:#64748b">${p._id.slice(-8)}</div></td>
+          <td><span class="status status-confirmed">${p.category}</span></td>
+          <td style="color:#94a3b8">${p.brand || '—'}</td>
+          <td style="font-weight:700;color:#f59e0b">${fmtPrice(p.price)}</td>
+          <td><span style="color:#fbbf24">★</span> ${p.rating || 0}</td>
+          <td>${p.stock ?? 50}</td>
+          <td>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost btn-sm" onclick='openEditModal(${JSON.stringify(p)})'>✏️ Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p._id}')">🗑️ Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+                renderPagination(d.page, d.pages);
+            } catch (e) { toast('Failed to load products', 'error'); }
+        }
+
+        function renderPagination(page, pages) {
+            const el = document.getElementById('pagination');
+            if (pages <= 1) { el.innerHTML = ''; return; }
+            let html = '';
+            for (let i = 1; i <= pages; i++) {
+                if (i === 1 || i === pages || Math.abs(i - page) <= 2) {
+                    html += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="loadProducts(${i})">${i}</button>`;
+                } else if (Math.abs(i - page) === 3) html += '<span style="color:#64748b;padding:0 4px">…</span>';
+            }
+            el.innerHTML = html;
+        }
+
+        function openAddModal() {
+            document.getElementById('modal-title').textContent = 'Add Product';
+            document.getElementById('submit-btn').textContent = 'Add Product';
+            document.getElementById('edit-id').value = '';
+            document.getElementById('product-form').reset();
+            document.getElementById('product-modal').classList.add('open');
+        }
+
+        function openEditModal(p) {
+            document.getElementById('modal-title').textContent = 'Edit Product';
+            document.getElementById('submit-btn').textContent = 'Save Changes';
+            document.getElementById('edit-id').value = p._id;
+            document.getElementById('f-title').value = p.title || '';
+            document.getElementById('f-brand').value = p.brand || '';
+            document.getElementById('f-category').value = p.category || '';
+            document.getElementById('f-subcategory').value = p.subcategory || '';
+            document.getElementById('f-price').value = p.price || '';
+            document.getElementById('f-original-price').value = p.originalPrice || '';
+            document.getElementById('f-discount').value = p.discount || '';
+            document.getElementById('f-rating').value = p.rating || '';
+            document.getElementById('f-stock').value = p.stock ?? 50;
+            document.getElementById('f-reviews').value = p.reviewCount || '';
+            document.getElementById('f-image').value = ''; // Reset file input
+            document.getElementById('f-desc').value = p.description || '';
+            document.getElementById('f-assured').checked = !!p.isAssured;
+            document.getElementById('f-eco').checked = !!p.isEcoFriendly;
+            document.getElementById('product-modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('open');
+        }
+
+        async function submitProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true; btn.textContent = 'Saving…';
+
+            const formData = new FormData();
+            formData.append('title', document.getElementById('f-title').value);
+            formData.append('brand', document.getElementById('f-brand').value);
+            formData.append('category', document.getElementById('f-category').value);
+            formData.append('subcategory', document.getElementById('f-subcategory').value);
+            formData.append('price', Number(document.getElementById('f-price').value));
+
+            if (document.getElementById('f-original-price').value) formData.append('originalPrice', document.getElementById('f-original-price').value);
+            formData.append('discount', Number(document.getElementById('f-discount').value) || 0);
+            formData.append('rating', Number(document.getElementById('f-rating').value) || 0);
+            formData.append('stock', Number(document.getElementById('f-stock').value) || 50);
+            formData.append('reviewCount', Number(document.getElementById('f-reviews').value) || 0);
+            formData.append('description', document.getElementById('f-desc').value);
+            formData.append('isAssured', document.getElementById('f-assured').checked);
+            formData.append('isEcoFriendly', document.getElementById('f-eco').checked);
+
+            const fileInput = document.getElementById('f-image');
+            if (fileInput.files.length > 0) {
+                formData.append('imageFile', fileInput.files[0]);
+            }
+
+            try {
+                const headers = { Authorization: 'Bearer ' + getToken() };
+                const r = await fetch(API + (id ? `/api/admin/products/${id}` : '/api/admin/products'), {
+                    method: id ? 'PUT' : 'POST',
+                    headers: headers,
+                    body: formData
+                });
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.error);
+                toast(id ? 'Product updated!' : 'Product added!', 'success');
+                closeModal();
+                loadProducts(currentPage);
+            } catch (ex) { toast(ex.message, 'error'); }
+            finally { btn.disabled = false; btn.textContent = id ? 'Save Changes' : 'Add Product'; }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirmAction('Delete this product? This cannot be undone.')) return;
+            try {
+                const r = await apiFetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.error);
+                toast('Product deleted', 'success');
+                loadProducts(currentPage);
+            } catch (ex) { toast(ex.message, 'error'); }
+        }
+
+        // Close modal on overlay click
+        document.getElementById('product-modal').addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+
+        (async () => { if (await requireAuth()) loadProducts(1); })();
+    </script>
+</body>
+
+</html>

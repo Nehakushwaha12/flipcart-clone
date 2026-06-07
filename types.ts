@@ -1,5 +1,5 @@
 export interface Product {
-  id: number;
+  id: string | number;
   title: string;
   description: string;
   price: number;
@@ -13,6 +13,7 @@ export interface Product {
   images: string[];
   isAssured?: boolean;
   sellerType?: string;
+  stock: number;
 }
 
 export interface CartItem extends Product {

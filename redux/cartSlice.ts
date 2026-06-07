@@ -41,14 +41,14 @@ const cartSlice = createSlice({
       state.totalPrice = totals.totalPrice;
       localStorage.setItem('cartItems', JSON.stringify(state.items));
     },
-    removeFromCart: (state, action: PayloadAction<number>) => {
+    removeFromCart: (state, action: PayloadAction<string | number>) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
       const totals = calculateTotals(state.items);
       state.totalQuantity = totals.totalQuantity;
       state.totalPrice = totals.totalPrice;
       localStorage.setItem('cartItems', JSON.stringify(state.items));
     },
-    updateQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
+    updateQuantity: (state, action: PayloadAction<{ id: string | number; quantity: number }>) => {
       const { id, quantity } = action.payload;
       const item = state.items.find((item) => item.id === id);
       if (item && quantity > 0) {

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — ApnaStore</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-bg"></div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="emoji">🛒</div>
+        <h1>ApnaStore Admin</h1>
+        <p>Sign in to manage your store</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input id="username" type="text" placeholder="admin" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <div id="error-msg" style="color:#ef4444;font-size:13px;margin-bottom:12px;display:none"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" id="login-btn">
+          Sign In
+        </button>
+      </form>
+
+
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (getToken()) {
+      fetch('http://localhost:5000/api/admin/verify', {
+        headers: { Authorization: 'Bearer ' + getToken() }
+      }).then(r => { if (r.ok) window.location.href = 'dashboard.html'; }).catch(() => {});
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const err = document.getElementById('error-msg');
+      btn.textContent = 'Signing in…';
+      btn.disabled = true;
+      err.style.display = 'none';
+      try {
+        const r = await fetch('http://localhost:5000/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value.trim(),
+            password: document.getElementById('password').value
+          })
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Login failed');
+        localStorage.setItem('admin_token', d.token);
+        localStorage.setItem('admin_username', d.username);
+        window.location.href = 'dashboard.html';
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.style.display = 'block';
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

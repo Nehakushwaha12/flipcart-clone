@@ -69,7 +69,7 @@ const ChatBot: React.FC = () => {
       {!isOpen && (
         <button
           onClick={toggleChat}
-          className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center gap-2 group"
+          className="fixed bottom-6 right-6 bg-pink-600 text-white p-4 rounded-full shadow-lg hover:bg-pink-700 transition-all z-50 flex items-center gap-2 group"
           aria-label="Open Chat"
         >
           <MessageCircle size={28} />
@@ -81,19 +81,19 @@ const ChatBot: React.FC = () => {
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-[350px] md:w-[380px] h-[500px] bg-white rounded-lg shadow-2xl flex flex-col z-50 border border-gray-200 overflow-hidden font-sans animate-in slide-in-from-bottom-5 fade-in duration-300">
           {/* Header */}
-          <div className="bg-blue-600 p-4 flex justify-between items-center text-white shadow-md">
+          <div className="bg-pink-600 p-4 flex justify-between items-center text-white shadow-md">
             <div className="flex items-center gap-3">
                 <div className="bg-white p-1.5 rounded-full shadow-sm">
-                    <Bot size={20} className="text-blue-600" />
+                    <Bot size={20} className="text-pink-600" />
                 </div>
                 <div>
                     <h3 className="font-bold text-sm tracking-wide">Ayushi Assistant</h3>
-                    <p className="text-[10px] text-blue-100 flex items-center gap-1.5">
+                    <p className="text-[10px] text-pink-100 flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(74,222,128,0.8)]"></span> Online
                     </p>
                 </div>
             </div>
-            <button onClick={toggleChat} className="text-blue-100 hover:text-white transition-colors bg-blue-700/50 p-1.5 rounded-md hover:bg-blue-700">
+            <button onClick={toggleChat} className="text-blue-100 hover:text-white transition-colors bg-pink-700/50 p-1.5 rounded-md hover:bg-pink-700">
               <Minimize2 size={18} />
             </button>
           </div>
@@ -105,7 +105,7 @@ const ChatBot: React.FC = () => {
                 <div 
                     className={`max-w-[85%] p-3 text-sm leading-relaxed shadow-sm ${
                         msg.role === 'user' 
-                        ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' 
+                        ? 'bg-pink-600 text-white rounded-2xl rounded-tr-sm' 
                         : 'bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-tl-sm'
                     }`}
                 >
@@ -116,7 +116,7 @@ const ChatBot: React.FC = () => {
             {isLoading && (
               <div className="flex justify-start">
                  <div className="bg-white p-4 rounded-2xl rounded-tl-sm border border-gray-200 shadow-sm flex items-center gap-3">
-                    <Loader2 size={16} className="animate-spin text-blue-600" />
+                    <Loader2 size={16} className="animate-spin text-pink-600" />
                     <span className="text-xs text-gray-500 font-medium">Ayushi is thinking...</span>
                  </div>
               </div>
@@ -133,14 +133,14 @@ const ChatBot: React.FC = () => {
               <input
                 type="text"
                 placeholder="Ask about products..."
-                className="flex-1 bg-white border border-gray-300 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-900 placeholder-gray-500"
+                className="flex-1 bg-white border border-gray-300 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-500"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
               <button 
                 type="submit" 
                 disabled={isLoading || !input.trim()}
-                className="bg-blue-600 text-white p-2.5 rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow active:scale-95 flex-shrink-0"
+                className="bg-pink-600 text-white p-2.5 rounded-full hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow active:scale-95 flex-shrink-0"
               >
                 <Send size={18} className={input.trim() ? "ml-0.5" : ""} />
               </button>

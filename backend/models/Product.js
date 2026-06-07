@@ -18,6 +18,8 @@ const productSchema = new mongoose.Schema({
     isEcoFriendly: { type: Boolean, default: false },
     isBudgetFriendly: { type: Boolean, default: false },
     subcategory: { type: String, default: '' },
+    stock: { type: Number, default: 50 },
+    source: { type: String, default: 'Flipkart' }, // New field for multi-site
     tags: [{ type: String }],
 });
 

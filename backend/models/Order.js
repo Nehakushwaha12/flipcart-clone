@@ -20,7 +20,12 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: 'Delivered' // Mocking "Delivered" state for demonstration based on previous hardcoded UI
+    enum: ['Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+    default: 'Confirmed'
+  },
+  expectedDelivery: {
+    type: Date,
+    default: () => new Date(+new Date() + 3*24*60*60*1000) // Default 3 days from now
   },
   date: {
     type: Date,

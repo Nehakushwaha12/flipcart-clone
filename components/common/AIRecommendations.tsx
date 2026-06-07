@@ -57,8 +57,8 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ context, currentC
   return (
     <div className="my-8">
       <div className="flex items-center gap-2 mb-6">
-        <Sparkles className="text-purple-500 animate-pulse" size={24} />
-        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500">
+        <Sparkles className="text-pink-500 animate-pulse" size={24} />
+        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-500">
           Smart AI Recommendations
         </h2>
       </div>

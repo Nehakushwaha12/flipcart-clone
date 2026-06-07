@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders — ApnaStore Admin</title>
+    <link rel="stylesheet" href="admin.css" />
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🛒</div>
+                <div>
+                    <div class="logo-text">ApnaStore</div>
+                    <div class="logo-sub">Admin Panel</div>
+                </div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-label">Main</div>
+                <a href="dashboard.html" class="nav-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="products.html" class="nav-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" />
+                        <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
+                    </svg>
+                    Products
+                </a>
+                <a href="orders.html" class="nav-item active">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                        <rect x="9" y="3" width="6" height="4" rx="1" />
+                        <path d="M9 12h6M9 16h4" />
+                    </svg>
+                    Orders
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-ghost" style="width:100%;justify-content:center;">
+                    <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main">
+            <div class="topbar">
+                <div class="topbar-title">Orders</div>
+                <div class="topbar-right">
+                    <div class="admin-badge">
+                        <div class="dot"></div><span class="admin-username">admin</span>
+                    </div>
+                </div>
+            </div>
+            <div class="page">
+                <div class="toolbar" style="justify-content:space-between">
+                    <div class="toolbar-left">
+                        <select class="search-input" id="status-filter" style="max-width:200px"
+                            onchange="loadOrders(1)">
+                            <option value="">All Statuses</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Out for Delivery">Out for Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div id="total-count" style="font-size:13px;color:#64748b;text-align:right;"></div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Order Date</th>
+                                <th>Delivery Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-body">
+                            <tr>
+                                <td colspan="8">
+                                    <div class="loading-box">
+                                        <div class="spinner"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Order Status Modal -->
+    <div class="modal-overlay" id="order-modal">
+        <div class="modal" style="max-width:400px">
+            <div class="modal-header">
+                <div class="modal-title">Update Order Status</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="order-form" onsubmit="submitOrderStatus(event)">
+                <input type="hidden" id="edit-id" />
+                <div class="form-group">
+                    <label>Current Status</label>
+                    <select id="f-status" required>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        let currentPage = 1;
+
+        async function loadOrders(page = 1) {
+            currentPage = page;
+            const status = document.getElementById('status-filter').value;
+            const params = new URLSearchParams({ page, limit: 20 });
+            if (status) params.set('status', status);
+
+            const tbody = document.getElementById('orders-body');
+            tbody.innerHTML = '<tr><td colspan="8"><div class="loading-box"><div class="spinner"></div></div></td></tr>';
+
+            try {
+                const r = await apiFetch('/api/admin/orders?' + params);
+                const d = await r.json();
+                document.getElementById('total-count').textContent = `${d.total} orders`;
+                if (!d.orders.length) {
+                    tbody.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📭</div><p>No orders found</p></div></td></tr>';
+                    document.getElementById('pagination').innerHTML = '';
+                    return;
+                }
+                tbody.innerHTML = d.orders.map(o => `
+        <tr>
+          <td><code style="font-size:11px;color:#64748b;">${o._id.slice(-8)}</code></td>
+          <td><div style="font-weight:600">${o.user.name}</div><div style="font-size:11px;color:#64748b">${o.user.email}</div></td>
+          <td><div style="font-size:13px">${o.items.length} item(s)</div></td>
+          <td style="font-weight:700;color:#f59e0b">${fmtPrice(o.totalPrice)}</td>
+          <td>${statusPill(o.status)}</td>
+          <td style="color:#64748b">${fmtDate(o.date)}</td>
+          <td style="color:#10b981;font-weight:700">${fmtDate(o.expectedDelivery || addDays(o.date, 3))}</td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="openEditModal('${o._id}', '${o.status}')">✏️ Edit Status</button>
+          </td>
+        </tr>
+      `).join('');
+                renderPagination(d.page, d.pages);
+            } catch (e) { toast('Failed to load orders', 'error'); }
+        }
+
+        function renderPagination(page, pages) {
+            const el = document.getElementById('pagination');
+            if (pages <= 1) { el.innerHTML = ''; return; }
+            let html = '';
+            for (let i = 1; i <= pages; i++) {
+                html += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="loadOrders(${i})">${i}</button>`;
+            }
+            el.innerHTML = html;
+        }
+
+        function openEditModal(id, status) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('f-status').value = status;
+            document.getElementById('order-modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('order-modal').classList.remove('open');
+        }
+
+        async function submitOrderStatus(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true; btn.textContent = 'Updating…';
+            try {
+                const r = await apiFetch(`/api/admin/orders/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: document.getElementById('f-status').value })
+                });
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.error);
+                toast('Order status updated!', 'success');
+                closeModal();
+                loadOrders(currentPage);
+            } catch (ex) { toast(ex.message, 'error'); }
+            finally { btn.disabled = false; btn.textContent = 'Update Status'; }
+        }
+
+        // Close modal on overlay click
+        document.getElementById('order-modal').addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+
+        (async () => { if (await requireAuth()) loadOrders(1); })();
+    </script>
+</body>
+
+</html>

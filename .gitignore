@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 *.env
+# Environment files
+*.env
+
+# Uploads
+backend/uploads/
+
+# Dependencies
+backend/node_modules/
